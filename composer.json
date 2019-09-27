@@ -1,0 +1,54 @@
+{
+    "name": "intellow/make-route-for-laravel",
+    "description": "Adds a php artisan make:route command. This scaffolds the route in web.php, controller, and even generates a unit test",
+    "keywords": [
+        "intellow",
+        "make-route-for-laravel"
+    ],
+    "homepage": "https://github.com/intellow/make-route-for-laravel",
+    "license": "MIT",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Kevin McKee",
+            "email": "kevin@intellow.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^7.1",
+        "illuminate/support": "5.8.*"
+    },
+    "require-dev": {
+        "orchestra/testbench": "3.8.*",
+        "phpunit/phpunit": "^7.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Intellow\\MakeRouteForLaravel\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Intellow\\MakeRouteForLaravel\\Tests\\": "tests"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
+
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Intellow\\MakeRouteForLaravel\\MakeRouteForLaravelServiceProvider"
+            ],
+            "aliases": {
+                "MakeRouteForLaravel": "Intellow\\MakeRouteForLaravel\\MakeRouteForLaravelFacade"
+            }
+        }
+    }
+}
