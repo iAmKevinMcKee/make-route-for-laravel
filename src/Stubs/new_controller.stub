@@ -1,0 +1,13 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+
+class |CONTROLLER_NAME| extends Controller
+{
+    public function |RESOURCEFUL_ACTION|(Request $request)
+    {
+
+    }
+}

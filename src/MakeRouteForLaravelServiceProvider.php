@@ -3,6 +3,7 @@
 namespace Intellow\MakeRouteForLaravel;
 
 use Illuminate\Support\ServiceProvider;
+use Intellow\MakeRouteForLaravel\Console\MakeRoute;
 
 class MakeRouteForLaravelServiceProvider extends ServiceProvider
 {
@@ -20,6 +21,9 @@ class MakeRouteForLaravelServiceProvider extends ServiceProvider
         // $this->loadRoutesFrom(__DIR__.'/routes.php');
 
         if ($this->app->runningInConsole()) {
+            $this->commands([
+                MakeRoute::class,
+            ]);
             $this->publishes([
                 __DIR__.'/../config/config.php' => config_path('make-route-for-laravel.php'),
             ], 'config');
