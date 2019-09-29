@@ -1,0 +1,1 @@
+Route::post('/|SLUG|/', [|CONTROLLER_NAME|::class, 'store']);

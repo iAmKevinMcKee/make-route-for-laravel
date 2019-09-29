@@ -1,0 +1,8 @@
+    @test
+    public function test|MODEL||ACTION|()
+    {
+        $response = $this->get('|SLUG|');
+
+        $response->assertStatus(200);
+    }
+}

@@ -1,0 +1,1 @@
+Route::patch('/|SLUG|/', [|CONTROLLER_NAME|::class, 'update']);

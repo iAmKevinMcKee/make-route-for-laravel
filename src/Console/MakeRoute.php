@@ -22,8 +22,7 @@ class MakeRoute extends Command
     /**
      * Create a new command instance.
      *
-     * @param Filesystem $files
-     * @param Composer $composer
+     * @param  Filesystem  $files
      */
     public function __construct(Filesystem $files)
     {
@@ -34,12 +33,11 @@ class MakeRoute extends Command
     // Direct code and/or inspiration came from https://github.com/amochohan/laravel-make-resource/
     public function handle()
     {
-        $slug =                 trim($this->input->getArgument('slug'));
-        $resourcefulAction =    trim($this->input->getArgument('resourceful-action'));
+        $slug = trim($this->input->getArgument('slug'));
+        $resourcefulAction = trim($this->input->getArgument('resourceful-action'));
 
-        $this->info('resourceful action: ' . $resourcefulAction);
         if(!$this->ensureValidResourcefulAction($resourcefulAction)) {
-            $this->error('You did not enter a resourceful action');
+            $this->error('You did not enter a valid resourceful action');
             return;
         }
 
@@ -51,16 +49,27 @@ class MakeRoute extends Command
 
     private function appendRoute($slug, $pascalCase, $resourcefulAction)
     {
-        if($resourcefulAction === 'index') {
-            $controllerName = $pascalCase . 'Controller';
-            $newRoutes = $this->files->get(__DIR__ . '/../Stubs/Routes/index.stub');
-            $newRoutes = str_replace('|SLUG|', $slug, $newRoutes);
-            $newRoutes = str_replace('|CONTROLLER_NAME|', $controllerName, $newRoutes);
+        $controllerName = $pascalCase . 'Controller';
+        switch ($resourcefulAction) {
+            case 'index':
+                $newRoutes = $this->files->get(__DIR__ . '/../Stubs/Routes/index.stub');
+                $newRoutes = str_replace('|SLUG|', $slug, $newRoutes);
+                $newRoutes = str_replace('|CONTROLLER_NAME|', $controllerName, $newRoutes);
 
-            $this->files->append(
-                base_path('routes/web.php'),
-                $newRoutes
-            );
+                $this->files->append(
+                    base_path('routes/web.php'),
+                    $newRoutes
+                );
+            case 'store':
+                $newRoutes = $this->files->get(__DIR__ . '/../Stubs/Routes/store.stub');
+                $newRoutes = str_replace('|SLUG|', $slug, $newRoutes);
+                $newRoutes = str_replace('|CONTROLLER_NAME|', $controllerName, $newRoutes);
+
+                $this->files->append(
+                    base_path('routes/web.php'),
+                    $newRoutes
+                );
+
         }
 
         $this->info('Added route for ' . $slug . ' in web.php');
