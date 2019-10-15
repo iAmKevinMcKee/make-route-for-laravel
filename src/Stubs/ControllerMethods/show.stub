@@ -1,9 +1,9 @@
     /**
      * Display a listing of the resource.
      *
-     * @param Request $request
+     * @param |PASCAL| $|CAMEL|
      */
-    public function index(Request $request)
+    public function show(|PASCAL| $|CAMEL|)
     {
         //
     }

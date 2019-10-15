@@ -44,11 +44,12 @@ class MakeModelRoute extends Command
 
         $baseModel = new Convert($model);
         $baseModelPlural = new Convert(Str::plural($model));
-        $controllerName = '\\App\\Http\\Controllers\\' . $baseModel->toPascal() . 'Controller';
-        $this->appendRoute($baseModel, $baseModelPlural, $controllerName, $resourcefulAction);
+        $controllerRouteName = '\\App\\Http\\Controllers\\' . $baseModel->toPascal() . 'Controller';
+        $controllerName = $baseModel->toPascal() . 'Controller';
+        $this->appendRoute($baseModel, $baseModelPlural, $controllerRouteName, $resourcefulAction);
         $this->createOrUpdateController($baseModel, $baseModelPlural, $controllerName, $resourcefulAction);
         $this->createView();
-        $this->generateTests();
+//        $this->generateTests();
     }
 
     private function appendRoute($baseModel, $baseModelPlural, $controllerName, $resourcefulAction)
@@ -109,6 +110,7 @@ class MakeModelRoute extends Command
         // if controller doesn't exist, create
         // if it does exist, check for method
         // if method exists, do nothing. If not, create method
+        $this->info('controller name: ' . $controllerName);
         $controllerPath = app_path('Http/Controllers/' . $controllerName . '.php');
         if($this->files->exists($controllerPath)) {
             // check for the individual method and if it doesn't exist add it
@@ -132,42 +134,26 @@ class MakeModelRoute extends Command
                 case 'index':
                     $newMethod = $this->files->get(__DIR__.'/../Stubs/ControllerMethods/index.stub');
                     break;
-//                case 'create':
-//                    $slug = $baseModelPlural->toKebab().'/create';
-//                    $newRoute = $this->files->get(__DIR__.'/../Stubs/ModelRoutes/create.stub');
-//                    $newRoute = str_replace('|SLUG|', $slug, $newRoute);
-//                    $newRoute = str_replace('|CONTROLLER_NAME|', $controllerName, $newRoute);
-//                    break;
+                case 'create':
+                    $newMethod = $this->files->get(__DIR__.'/../Stubs/ControllerMethods/create.stub');
+                    break;
 //                case 'store':
-//                    $slug = $baseModelPlural->toKebab();
-//                    $newRoute = $this->files->get(__DIR__.'/../Stubs/ModelRoutes/store.stub');
-//                    $newRoute = str_replace('|SLUG|', $slug, $newRoute);
-//                    $newRoute = str_replace('|CONTROLLER_NAME|', $controllerName, $newRoute);
+//                    $newMethod = $this->files->get(__DIR__.'/../Stubs/ControllerMethods/store.stub');
 //                    break;
-//                case 'show':
-//                    $slug = $baseModelPlural->toKebab().'/{'.$baseModel->toCamel().'}';
-//                    $newRoute = $this->files->get(__DIR__.'/../Stubs/ModelRoutes/show.stub');
-//                    $newRoute = str_replace('|SLUG|', $slug, $newRoute);
-//                    $newRoute = str_replace('|CONTROLLER_NAME|', $controllerName, $newRoute);
-//                    break;
-//                case 'edit':
-//                    $slug = $baseModelPlural->toKebab().'/{'.$baseModel->toCamel().'}/edit';
-//                    $newRoute = $this->files->get(__DIR__.'/../Stubs/ModelRoutes/edit.stub');
-//                    $newRoute = str_replace('|SLUG|', $slug, $newRoute);
-//                    $newRoute = str_replace('|CONTROLLER_NAME|', $controllerName, $newRoute);
-//                    break;
-//                case 'update':
-//                    $slug = $baseModelPlural->toKebab().'/{'.$baseModel->toCamel().'}';
-//                    $newRoute = $this->files->get(__DIR__.'/../Stubs/ModelRoutes/update.stub');
-//                    $newRoute = str_replace('|SLUG|', $slug, $newRoute);
-//                    $newRoute = str_replace('|CONTROLLER_NAME|', $controllerName, $newRoute);
-//                    break;
-//                case 'destroy':
-//                    $slug = $baseModelPlural->toKebab().'/{'.$baseModel->toCamel().'}';
-//                    $newRoute = $this->files->get(__DIR__.'/../Stubs/ModelRoutes/destroy.stub');
-//                    $newRoute = str_replace('|SLUG|', $slug, $newRoute);
-//                    $newRoute = str_replace('|CONTROLLER_NAME|', $controllerName, $newRoute);
-//                    break;
+                case 'show':
+                    $newMethod = $this->files->get(__DIR__.'/../Stubs/ControllerMethods/show.stub');
+                    $newMethod = str_replace('|PASCAL|', $baseModel->toPascal(), $newMethod);
+                    $newMethod = str_replace('|CAMEL|', $baseModel->toCamel(), $newMethod);
+                    break;
+                case 'edit':
+                    $newMethod = $this->files->get(__DIR__.'/../Stubs/ControllerMethods/edit.stub');
+                    break;
+                case 'update':
+                    $newMethod = $this->files->get(__DIR__.'/../Stubs/ControllerMethods/update.stub');
+                    break;
+                case 'destroy':
+                    $newMethod = $this->files->get(__DIR__.'/../Stubs/ControllerMethods/destroy.stub');
+                    break;
             }
             // add new method to bottom of controller
             $controller .= $newMethod;
