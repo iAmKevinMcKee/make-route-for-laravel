@@ -17,23 +17,41 @@ composer require intellow/make-route-for-laravel
 
 ## Usage
 
+In your command line, you can now use a single artisan command to create the following:
+- Entry in your routes file (web.php)
+- Controller method
+- More to come in future releases
+
 ``` php
-// Usage description here
+php artisan make:model-route Model resourcefulAction
 ```
 
-### Testing
-
-``` bash
-composer test
+So if you run the following command
+``` php
+php artisan make:model PizzaPie index
 ```
 
-### Changelog
+You will get the following:
 
-Please see [CHANGELOG](CHANGELOG.md) for more information what has changed recently.
+``` php
+// in web.php
+Route::get('/pizza-pies/', [\App\Http\Controllers\PizzaPieController::class, 'index']);
 
-## Contributing
+// in Http\Controllers\PizzaPieController.php
+// This file will be created if it doesn't exist already
+// The following method will be appended to the end of the file
 
-Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
+/**
+ * Display a listing of the resource.
+ *
+ * @param Request $request
+ */
+public function index()
+{
+    //
+}
+
+```
 
 ### Security
 
