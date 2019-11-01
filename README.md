@@ -1,11 +1,11 @@
-# Very short description of the package
+# Make Route For Laravel
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/intellow/make-route-for-laravel.svg?style=flat-square)](https://packagist.org/packages/intellow/make-route-for-laravel)
 [![Build Status](https://img.shields.io/travis/intellow/make-route-for-laravel/master.svg?style=flat-square)](https://travis-ci.org/intellow/make-route-for-laravel)
 [![Quality Score](https://img.shields.io/scrutinizer/g/intellow/make-route-for-laravel.svg?style=flat-square)](https://scrutinizer-ci.com/g/intellow/make-route-for-laravel)
 [![Total Downloads](https://img.shields.io/packagist/dt/intellow/make-route-for-laravel.svg?style=flat-square)](https://packagist.org/packages/intellow/make-route-for-laravel)
 
-This is where your description should go. Try and limit it to a paragraph or two, and maybe throw in a mention of what PSRs you support to avoid any confusion with users and contributors.
+This is an opinionated package that creates boilerplate in your routes and controller files.
 
 ## Installation
 
