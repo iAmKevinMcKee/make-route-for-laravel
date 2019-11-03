@@ -21,6 +21,8 @@ In your command line, you can now use a single artisan command to create the fol
 - Entry in your routes file (web.php)
 - Controller created if one does not exist
 - Your specified method added to the bottom of the controller
+- Model is created if one doesn't already exist (optional)
+- Migration for the model is created if one doesn't already exist (optional)
 - An empty view is created
 - For index and create actions, a basic unit test is created
 - More to come in future releases
