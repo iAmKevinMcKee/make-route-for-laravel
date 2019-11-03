@@ -50,7 +50,7 @@ class MakeModelRoute extends Command
         $this->createOrUpdateController();
         $this->createModel();
         $this->createView();
-//        $this->generateTests();
+        $this->generateTests();
     }
 
     private function appendRoute()
@@ -173,31 +173,31 @@ class MakeModelRoute extends Command
                 $controllerPath,
                 $controller
             );
-            $this->info('Controller method "' . $this->resourcefulAction . '" added');
+            $this->info('Controller method "'.$this->resourcefulAction.'" added');
         } else {
-            $this->line('Controller method "' . $this->resourcefulAction . '" already exists, no changes in controller');
+            $this->line('Controller method "'.$this->resourcefulAction.'" already exists, no changes in controller');
         }
     }
 
     private function createModel()
     {
-        $modelPath = app_path($this->baseModel .'.php');
+        $modelPath = app_path($this->baseModel.'.php');
         if ($this->files->exists($modelPath)) {
             $this->line('Model '.$this->baseModel.' already exists');
         } else {
-            if($this->confirm('This model, ' . $this->baseModel . ', does not exist. Do you want to create it?')) {
+            if ($this->confirm('This model, '.$this->baseModel.', does not exist. Do you want to create it?')) {
                 $command = 'make:model '.$this->baseModel;
                 if ($withModel = $this->confirm('Do you want to generate a migration for this model?')) {
                     $command .= ' -m';
                 }
                 Artisan::call($command);
-                if($withModel) {
+                if ($withModel) {
                     $this->info($this->baseModel.' Model created with migration.');
                 } else {
                     $this->info($this->baseModel.' Model created without migration.');
                 }
             } else {
-                $this->info('Model ' . $this->baseModel . ' not created.');
+                $this->line('Model '.$this->baseModel.' not created.');
             }
         }
     }
@@ -205,7 +205,7 @@ class MakeModelRoute extends Command
     private function createView()
     {
         $needsView = collect(['index', 'show', 'edit', 'create']);
-        if($needsView->contains($this->resourcefulAction)) {
+        if ($needsView->contains($this->resourcefulAction)) {
             $path = 'resources/views/models/'.Str::snake($this->baseModel).'/'.$this->resourcefulAction.'.blade.php';
             if ( !$this->files->exists($path)) {
                 if ( !$this->files->exists('resources/views/models')) {
@@ -232,21 +232,43 @@ class MakeModelRoute extends Command
         // If it does exist, do nothing
     }
 
-    private function generateTests($url)
+    private function generateTests()
     {
-        // generate basic tests for get routes
-        // check for AutomatedRouteTests stub, create if doesn't exist
-        // Append basic test to the bottom of this file
+        if($this->resourcefulAction == 'index' || $this->resourcefulAction == 'create') {
+            $testClassPath = base_path('tests/Feature/AutomatedRouteTests.php');
+            $this->createTestClassIfDoesNotExist($testClassPath);
+            $newTest = $this->files->get(__DIR__.'/../Stubs/Tests/model_test_case.stub');
+            $newTest = str_replace('|MODEL|', Str::studly($this->baseModel), $newTest);
+            $newTest = str_replace('|ACTION|', Str::studly($this->resourcefulAction), $newTest);
+            $slug = Str::slug(Str::snake(Str::plural($this->baseModel)));
+            if($this->resourcefulAction == 'create') {
+                $slug .= '/create';
+            }
+            $newTest = str_replace('|SLUG|', $slug, $newTest);
+            $testClass = $this->files->get($testClassPath);
+            // remove the last two characters of the controller
+            $testClass = substr($testClass, 0, -2);
+            // add new method to bottom of controller
+            $testClass .= $newTest;
+            // update the controller file on the server
+            $this->files->replace(
+                $testClassPath,
+                $testClass
+            );
+            $this->info('New Test Added');
+        }
     }
 
     private function isValidResourcefulAction()
     {
         $valid = collect(['index', 'show', 'edit', 'update', 'create', 'store', 'destroy']);
 
-        if( !$valid->contains($this->resourcefulAction)) {
+        if ( !$valid->contains($this->resourcefulAction)) {
             $this->error('You did not enter a valid resourceful action');
+
             return false;
         }
+
         return true;
     }
 
@@ -276,5 +298,13 @@ class MakeModelRoute extends Command
         }
 
         return true;
+    }
+
+    private function createTestClassIfDoesNotExist($testClassPath)
+    {
+        if ( !$this->files->exists($testClassPath)) {
+            Artisan::call('make:test AutomatedRouteTests');
+            $this->info('Created AutomatedRouteTests at /tests/Feature/AutomatedRouteTests.php');
+        }
     }
 }
