@@ -19,7 +19,10 @@ composer require intellow/make-route-for-laravel
 
 In your command line, you can now use a single artisan command to create the following:
 - Entry in your routes file (web.php)
-- Controller method
+- Controller created if one does not exist
+- Your specified method added to the bottom of the controller
+- An empty view is created
+- For index and create actions, a basic unit test is created
 - More to come in future releases
 
 ``` php
