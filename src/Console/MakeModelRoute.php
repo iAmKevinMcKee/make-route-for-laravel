@@ -5,6 +5,7 @@ namespace Intellow\MakeRouteForLaravel\Console;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Artisan;
 
@@ -48,7 +49,7 @@ class MakeModelRoute extends Command
         $this->appendRoute();
         $this->createOrUpdateController();
         $this->createModel();
-        //        $this->createView();
+        $this->createView();
 //        $this->generateTests();
     }
 
@@ -100,11 +101,16 @@ class MakeModelRoute extends Command
                 $newRoute = str_replace('|CONTROLLER_NAME|', $controllerName, $newRoute);
                 break;
         }
-        $this->files->append(
-            base_path('routes/web.php'),
-            $newRoute
-        );
-        $this->info(Str::studly($this->baseModel).' - '.$this->resourcefulAction.' route written to web.php');
+        $web = $this->files->get('routes/web.php');
+        if (strpos($web, $newRoute) == false) {
+            $this->files->append(
+                base_path('routes/web.php'),
+                $newRoute
+            );
+            $this->info(Str::studly($this->baseModel).' - '.$this->resourcefulAction.' route written to web.php');
+        } else {
+            $this->line('Route already exists. Nothing added to web.php file');
+        }
     }
 
     private function createOrUpdateController()
@@ -117,7 +123,7 @@ class MakeModelRoute extends Command
         if ($this->files->exists($controllerPath)) {
             // check for the individual method and if it doesn't exist add it
             // otherwise, do nothing
-            $this->info('Controller '.$controllerName.' already exists');
+            $this->line('Controller '.$controllerName.' already exists');
         } else {
             Artisan::call('make:controller '.$controllerName);
             $this->info('Controller '.$controllerName.' created');
@@ -167,9 +173,9 @@ class MakeModelRoute extends Command
                 $controllerPath,
                 $controller
             );
-            $this->info('Controller method added');
+            $this->info('Controller method "' . $this->resourcefulAction . '" added');
         } else {
-            $this->info('Controller Method already exists, no changes in controller');
+            $this->line('Controller method "' . $this->resourcefulAction . '" already exists, no changes in controller');
         }
     }
 
@@ -177,7 +183,7 @@ class MakeModelRoute extends Command
     {
         $modelPath = app_path($this->baseModel .'.php');
         if ($this->files->exists($modelPath)) {
-            $this->info('Model '.$this->baseModel.' already exists');
+            $this->line('Model '.$this->baseModel.' already exists');
         } else {
             if($this->confirm('This model, ' . $this->baseModel . ', does not exist. Do you want to create it?')) {
                 $command = 'make:model '.$this->baseModel;
@@ -198,7 +204,25 @@ class MakeModelRoute extends Command
 
     private function createView()
     {
-        // Create standard convention for views
+        $needsView = collect(['index', 'show', 'edit', 'create']);
+        if($needsView->contains($this->resourcefulAction)) {
+            $path = 'resources/views/models/'.Str::snake($this->baseModel).'/'.$this->resourcefulAction.'.blade.php';
+            if ( !$this->files->exists($path)) {
+                if ( !$this->files->exists('resources/views/models')) {
+                    $this->files->makeDirectory('resources/views/models');
+                }
+                if ( !$this->files->exists('resources/views/models/'.Str::snake($this->baseModel))) {
+                    $this->files->makeDirectory('resources/views/models/'.Str::snake($this->baseModel));
+                }
+                $this->files->put(
+                    base_path('resources/views/models/'.Str::snake($this->baseModel).'/'.$this->resourcefulAction.'.blade.php'),
+                    $this->files->get(__DIR__.'/../Stubs/empty_view.stub')
+                );
+                $this->info('Empty view created at '.$path);
+            } else {
+                $this->line('The view already exists, no view was created.');
+            }
+        }
     }
 
     private function generateFormRequest()
