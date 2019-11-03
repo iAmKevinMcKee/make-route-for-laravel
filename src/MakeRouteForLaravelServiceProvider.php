@@ -56,7 +56,7 @@ class MakeRouteForLaravelServiceProvider extends ServiceProvider
     public function register()
     {
         // Automatically apply the package configuration
-        $this->mergeConfigFrom(__DIR__.'/../config/config.php', 'make-route-for-laravel');
+        $this->mergeConfigFrom(__DIR__.'/../config/make-route.php', 'make-route-for-laravel');
 
         // Register the main class to use with the facade
         $this->app->singleton('make-route-for-laravel', function () {
