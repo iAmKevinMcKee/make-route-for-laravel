@@ -33,7 +33,7 @@ php artisan make:model-route Model resourcefulAction
 
 So if you run the following command
 ``` php
-php artisan make:model PizzaPie index
+php artisan make:model-route PizzaPie index
 ```
 
 You will get the following:
@@ -54,6 +54,16 @@ Route::get('/pizza-pies/', [\App\Http\Controllers\PizzaPieController::class, 'in
 public function index()
 {
     //
+}
+
+// A basic feature test to hit this route and check the response is successful
+// In tests/Feature/AutomatedRouteTests.php
+
+public function testPizzaPieIndex()
+{
+    $response = $this->get('pizza-pies');
+
+    $response->assertStatus(200);
 }
 
 ```
