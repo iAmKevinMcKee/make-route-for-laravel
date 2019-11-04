@@ -5,6 +5,6 @@
      */
     public function edit(|PASCAL| $|CAMEL|)
     {
-        //
+        return view('|DIRECTORY|.|VIEWNAME|');
     }
 }

@@ -54,9 +54,11 @@ class MakeModelRoute extends Command
         if( !$this->appendRoute()) {
             return;
         }
-        $this->createOrUpdateController();
+        $controllerUpdated = $this->createOrUpdateController();
         $this->createModelIfDoesNotExist();
-        $this->createView();
+        if($controllerUpdated) {
+            $this->createModelView();
+        }
         $this->generateTests();
     }
 

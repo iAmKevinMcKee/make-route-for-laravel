@@ -26,6 +26,8 @@ class MakeRoute extends Command
     private $files;
     private $slug;
     private $resourcefulAction;
+    private $baseModel = null;
+    private $controllerName;
 
     /**
      * Create a new command instance.
@@ -53,16 +55,20 @@ class MakeRoute extends Command
 
             return;
         }
-        $controllerName = str_replace("-", " ", $this->slug);
+        $controllerName = rtrim(str_replace("-", " ", preg_replace('/{(.*?)}/', '', $this->slug)), '/');
         $controllerName = str_replace("_", " ", $controllerName);
         $controllerName = ucwords($controllerName);
         $controllerName = str_replace(" ", "", $controllerName);
-        $controllerName = '\\App\\Http\\Controllers\\' . $controllerName . 'Controller';
+        $this->controllerName = $controllerName . 'Controller';
+        $routeControllerName = '\\App\\Http\\Controllers\\' . $this->controllerName;
 
-        if ( !$this->appendRouteToRoutesFile($this->slug, $controllerName)) {
+        if ( !$this->appendRouteToRoutesFile($this->slug, $routeControllerName)) {
             return;
         }
-//        $this->createControllerMethod($slug, $pascalCase, $resourcefulAction);
+        $controllerUpdate = $this->createOrUpdateController($this->controllerName);
+        if($controllerUpdate) {
+            $this->createView(app_path('Http/Controllers/'.$this->controllerName.'.php'));
+        }
     }
 
     private function appendRoute($controllerName)
