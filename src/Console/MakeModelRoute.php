@@ -61,7 +61,7 @@ class MakeModelRoute extends Command
         if($controllerUpdated) {
             $this->createModelView(app_path('Http/Controllers/'.$controllerName.'.php'));
         }
-        $this->generateTests();
+        $this->generateModelTest();
     }
 
     private function appendRoute()

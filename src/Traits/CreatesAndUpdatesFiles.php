@@ -101,7 +101,7 @@ trait CreatesAndUpdatesFiles
     {
         $needsView = collect(['index', 'show', 'edit', 'create']);
         if ($needsView->contains($this->resourcefulAction)) {
-            $directory = str_replace('-', '_', $this->slug);
+            $directory = $this->pascalToSnake(substr($this->controllerName, 0, -10));
             $path = 'resources/views/other/'.$directory.'/'.$this->resourcefulAction.'.blade.php';
             if ( !$this->files->exists($path)) {
                 if ( !$this->files->exists('resources/views/other')) {
@@ -147,7 +147,34 @@ trait CreatesAndUpdatesFiles
         }
     }
 
-    private function generateTests()
+    private function generateModelTest()
+    {
+        if ($this->resourcefulAction == 'index' || $this->resourcefulAction == 'create') {
+            $testClassPath = base_path('tests/Feature/AutomatedRouteTests.php');
+            $this->createTestClassIfDoesNotExist($testClassPath);
+            $newTest = $this->files->get(__DIR__.'/../Stubs/Tests/model_test_case.stub');
+            $newTest = str_replace('|MODEL|', Str::studly($this->baseModel), $newTest);
+            $newTest = str_replace('|ACTION|', Str::studly($this->resourcefulAction), $newTest);
+            $slug = Str::slug(Str::snake(Str::plural($this->baseModel)));
+            if ($this->resourcefulAction == 'create') {
+                $slug .= '/create';
+            }
+            $newTest = str_replace('|SLUG|', $slug, $newTest);
+            $testClass = $this->files->get($testClassPath);
+            // remove the last two characters of the controller
+            $testClass = substr($testClass, 0, -2);
+            // add new method to bottom of controller
+            $testClass .= $newTest;
+            // update the controller file on the server
+            $this->files->replace(
+                $testClassPath,
+                $testClass
+            );
+            $this->info('New Test Added');
+        }
+    }
+
+    private function generateTest()
     {
         if ($this->resourcefulAction == 'index' || $this->resourcefulAction == 'create') {
             $testClassPath = base_path('tests/Feature/AutomatedRouteTests.php');
@@ -237,5 +264,14 @@ trait CreatesAndUpdatesFiles
             $controllerPath,
             $newController
         );
+    }
+
+    private function pascalToSnake($input) {
+        preg_match_all('!([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)!', $input, $matches);
+        $ret = $matches[0];
+        foreach ($ret as &$match) {
+            $match = $match == strtoupper($match) ? strtolower($match) : lcfirst($match);
+        }
+        return implode('_', $ret);
     }
 }

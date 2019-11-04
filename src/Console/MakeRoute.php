@@ -52,33 +52,7 @@ class MakeRoute extends Command
         if($controllerUpdate) {
             $this->createView(app_path('Http/Controllers/'.$this->controllerName.'.php'));
         }
-    }
-
-    private function appendRoute($controllerName)
-    {
-        return $this->appendRouteToRoutesFile($this->slug, $controllerName);
-    }
-
-    private function createControllerMethod($slug, $pascalCase, $resourcefulAction)
-    {
-        // if controller doesn't exist, create
-        // if it does exist, check for method
-        // if method exists, do nothing. If not, create method
-        $controllerName = $pascalCase.'Controller';
-        $controllerPath = app_path('Http/Controllers/'.$controllerName.'.php');
-        if ($this->files->exists($controllerPath)) {
-            // check for the individual method and if it doesn't exist add it
-            // otherwise, do nothing
-            $this->info('Controller already exists');
-        } else {
-            $controller = $this->files->get(__DIR__.'/../Stubs/new_controller.stub');
-            $controller = str_replace('|RESOURCEFUL_ACTION|', $resourcefulAction, $controller);
-            $controller = str_replace('|CONTROLLER_NAME|', $controllerName, $controller);
-
-            $this->files->put($controllerPath, $controller);
-            $this->info('Controller '.$controllerName.' created');
-        }
-
+        $this->generateTest();
     }
 
     private function validateMakeRouteInputs()
@@ -93,6 +67,7 @@ class MakeRoute extends Command
             $this->controllerName = $this->argument('controller-name');
         } else {
             $controllerName = rtrim(str_replace("-", " ", preg_replace('/{(.*?)}/', '', $this->slug)), '/');
+            $controllerName = str_replace('/', " ", $controllerName);
             $controllerName = str_replace("_", " ", $controllerName);
             $controllerName = ucwords($controllerName);
             $controllerName = str_replace(" ", "", $controllerName);

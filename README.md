@@ -27,6 +27,9 @@ In your command line, you can now use a single artisan command to create the fol
 - For index and create actions, a basic unit test is created
 - More to come in future releases
 
+
+## Model Routes
+If you are creating a route associated with a model, this is a great way to scaffold everything you need for that route.
 ``` php
 php artisan make:model-route Model resourcefulAction
 ```
@@ -38,35 +41,68 @@ php artisan make:model-route PizzaPie index
 
 You will get the following:
 
+#### web.php
 ``` php
-// in web.php
 Route::get('/pizza-pies/', [\App\Http\Controllers\PizzaPieController::class, 'index']);
-
-// in Http\Controllers\PizzaPieController.php
-// This file will be created if it doesn't exist already
-// The following method will be appended to the end of the file
-
-/**
- * Display a listing of the resource.
- *
- * @param Request $request
- */
+```
+#### Http\Controllers\PizzaPieController.php
+- This file will be created if it doesn't exist already
+- The method will be added to the bottom of the controller
+``` php
 public function index()
 {
-    //
+    return view('models.pizza_pie.index');
 }
-
-// A basic feature test to hit this route and check the response is successful
-// In tests/Feature/AutomatedRouteTests.php
-
+```
+#### resources\views\models\pizza_pie\index.blade.php
+- Create this directory if it doesn't exist already
+- Add a blank file with the following comment
+``` html
+{{--Create Something Amazing--}}
+```
+#### tests/Feature/AutomatedRouteTests.php
+- This is only done on index and create actions
+- Create this file if it doesn't already exist
+- A basic feature test to hit this route (GET only) and assert a successful response
+``` php
 public function testPizzaPieIndex()
 {
     $response = $this->get('pizza-pies');
 
     $response->assertStatus(200);
 }
-
 ```
+#### Create Model and Migration
+- If you have not yet created the model, you will be given the option to create it. If you choose to create the model, you can also choose to create the migration as well.
+- This package will run `php artisan make:model PizzaPie`  or `php artisan make:model PizzaPie -m` based on your choices
+
+## Non-Model Routes
+If you are creating a route that is not associated with a model, the package works a bit differently.
+``` php
+php artisan make:route <slug> <resourceful-action> [<controller-name>]
+```
+
+So if you run the following command
+``` php
+php artisan make:route /send-activation-email store
+```
+
+You will get the following:
+
+#### web.php
+``` php
+Route::post('/send-activation-email/', [\App\Http\Controllers\SendActivationEmailController::class, 'store']);
+```
+#### Http\Controllers\SendActivationEmailController.php
+- This file will be created if it doesn't exist already
+- The method will be added to the bottom of the controller
+``` php
+public function store(Request $request)
+{
+    
+}
+```
+No view is created because this is a store action, and no test is created either since it is not an index or create action.
 
 ### Security
 
