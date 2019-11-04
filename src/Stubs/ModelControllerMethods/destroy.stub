@@ -1,8 +1,3 @@
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param |PASCAL| $|CAMEL|
-     */
     public function destroy(|PASCAL| $|CAMEL|)
     {
         //
