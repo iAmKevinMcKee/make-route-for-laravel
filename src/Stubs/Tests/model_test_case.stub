@@ -1,5 +1,5 @@
 
-    public function test|ACTION||MODEL|()
+    public function test|MODEL||ACTION|()
     {
         $response = $this->get('|SLUG|');
 
