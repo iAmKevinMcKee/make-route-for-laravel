@@ -1,0 +1,10 @@
+    /**
+     * Display a listing of the resource.
+     *
+     * @param Request $request
+     */
+    public function index()
+    {
+        return view('|DIRECTORY|.|VIEWNAME|');
+    }
+}

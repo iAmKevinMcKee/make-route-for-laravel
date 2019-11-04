@@ -1,0 +1,10 @@
+    /**
+     * Display a listing of the resource.
+     *
+     * @param |PASCAL| $|CAMEL|
+     */
+    public function show(|PASCAL| $|CAMEL|)
+    {
+        return view('|DIRECTORY|.|VIEWNAME|', ['|CAMEL|', $|CAMEL|]);
+    }
+}

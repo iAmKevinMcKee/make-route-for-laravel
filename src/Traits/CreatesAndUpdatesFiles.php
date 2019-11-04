@@ -7,9 +7,10 @@ use Illuminate\Support\Facades\Artisan;
 
 trait CreatesAndUpdatesFiles
 {
+
     private function createOrUpdateController($controllerName = null)
     {
-        if(is_null($controllerName)) {
+        if (is_null($controllerName)) {
             $controllerName = Str::studly($this->baseModel).'Controller';
         }
         // if controller doesn't exist, create
@@ -28,21 +29,25 @@ trait CreatesAndUpdatesFiles
         $controller = $this->files->get($controllerPath);
         $methodName = 'public function '.$this->resourcefulAction;
         if (strpos($controller, $methodName) == false) {
-            if($this->baseModel) {
+            if ($this->baseModel) {
                 $controller = $this->addUseStatementIfDoesNotExist($this->baseModel, $controller);
+                $controllerStubLocation = '/../Stubs/ModelControllerMethods/'.$this->resourcefulAction.'.stub';
+            }
+            else {
+                $controllerStubLocation = '/../Stubs/ControllerMethods/'.$this->resourcefulAction.'.stub';
             }
             switch ($this->resourcefulAction) {
                 case 'index':
                 case 'create':
                 case 'store':
-                    $newMethod = $this->files->get(__DIR__.'/../Stubs/ControllerMethods/'. $this->resourcefulAction . '.stub');
+                    $newMethod = $this->files->get(__DIR__.$controllerStubLocation);
                     break;
                 case 'show':
                 case 'edit':
                 case 'update':
                 case 'destroy':
-                    $newMethod = $this->files->get(__DIR__.'/../Stubs/ControllerMethods/'. $this->resourcefulAction . '.stub');
-                    if($this->baseModel) {
+                    $newMethod = $this->files->get(__DIR__.$controllerStubLocation);
+                    if ($this->baseModel) {
                         $newMethod = str_replace('|PASCAL|', Str::studly($this->baseModel), $newMethod);
                         $newMethod = str_replace('|CAMEL|', Str::camel($this->baseModel), $newMethod);
                     } else {
@@ -60,9 +65,11 @@ trait CreatesAndUpdatesFiles
                 $controller
             );
             $this->info('Controller method "'.$this->resourcefulAction.'" added');
+
             return true;
         } else {
             $this->line('Controller method "'.$this->resourcefulAction.'" already exists, no changes in controller');
+
             return false;
         }
     }
@@ -108,24 +115,19 @@ trait CreatesAndUpdatesFiles
                     $this->files->get(__DIR__.'/../Stubs/empty_view.stub')
                 );
                 $this->info('Empty view created at '.$path);
-                $controller = $this->files->get($controllerPath);
-                $newController = str_replace('|DIRECTORY|', 'other', $controller);
-                $newController = str_replace('|VIEWNAME|', $directory.'.'.$this->resourcefulAction, $newController);
-                $this->files->replace(
-                    $controllerPath,
-                    $newController
-                );
+                $this->addViewNameToController($controllerPath, 'other', $directory);
             } else {
                 $this->line('The view already exists, no view was created.');
             }
         }
     }
 
-    private function createModelView()
+    private function createModelView($controllerPath)
     {
         $needsView = collect(['index', 'show', 'edit', 'create']);
         if ($needsView->contains($this->resourcefulAction)) {
-            $path = 'resources/views/models/'.Str::snake($this->baseModel).'/'.$this->resourcefulAction.'.blade.php';
+            $viewName = Str::snake($this->baseModel);
+            $path = 'resources/views/models/'.$viewName.'/'.$this->resourcefulAction.'.blade.php';
             if ( !$this->files->exists($path)) {
                 if ( !$this->files->exists('resources/views/models')) {
                     $this->files->makeDirectory('resources/views/models');
@@ -138,6 +140,7 @@ trait CreatesAndUpdatesFiles
                     $this->files->get(__DIR__.'/../Stubs/empty_view.stub')
                 );
                 $this->info('Empty view created at '.$path);
+                $this->addViewNameToController($controllerPath, 'models', $viewName);
             } else {
                 $this->line('The view already exists, no view was created.');
             }
@@ -146,14 +149,14 @@ trait CreatesAndUpdatesFiles
 
     private function generateTests()
     {
-        if($this->resourcefulAction == 'index' || $this->resourcefulAction == 'create') {
+        if ($this->resourcefulAction == 'index' || $this->resourcefulAction == 'create') {
             $testClassPath = base_path('tests/Feature/AutomatedRouteTests.php');
             $this->createTestClassIfDoesNotExist($testClassPath);
             $newTest = $this->files->get(__DIR__.'/../Stubs/Tests/model_test_case.stub');
             $newTest = str_replace('|MODEL|', Str::studly($this->baseModel), $newTest);
             $newTest = str_replace('|ACTION|', Str::studly($this->resourcefulAction), $newTest);
             $slug = Str::slug(Str::snake(Str::plural($this->baseModel)));
-            if($this->resourcefulAction == 'create') {
+            if ($this->resourcefulAction == 'create') {
                 $slug .= '/create';
             }
             $newTest = str_replace('|SLUG|', $slug, $newTest);
@@ -181,7 +184,8 @@ trait CreatesAndUpdatesFiles
             } else {
                 $useStatement .= "\n";
 
-                return substr_replace($controller, $useStatement, strpos($controller, 'class '. Str::studly($this->baseModel).'Controller'), 0);
+                return substr_replace($controller, $useStatement,
+                    strpos($controller, 'class '.Str::studly($this->baseModel).'Controller'), 0);
             }
         }
 
@@ -205,7 +209,7 @@ trait CreatesAndUpdatesFiles
 
     private function appendRouteToRoutesFile($slug, $controllerName)
     {
-        $newRoute = $this->files->get(__DIR__.'/../Stubs/ModelRoutes/' . $this->resourcefulAction . '.stub');
+        $newRoute = $this->files->get(__DIR__.'/../Stubs/ModelRoutes/'.$this->resourcefulAction.'.stub');
         $newRoute = str_replace('|SLUG|', $slug, $newRoute);
         $newRoute = str_replace('|CONTROLLER_NAME|', $controllerName, $newRoute);
         $web = $this->files->get('routes/web.php');
@@ -215,10 +219,23 @@ trait CreatesAndUpdatesFiles
                 $newRoute
             );
             $this->info('Route written to the bottom of web.php');
+
             return true;
         } else {
             $this->error('Route already exists. No changes were made.');
+
             return false;
         }
+    }
+
+    private function addViewNameToController($controllerPath, $baseDirectory, $viewName)
+    {
+        $controller = $this->files->get($controllerPath);
+        $newController = str_replace('|DIRECTORY|', $baseDirectory, $controller);
+        $newController = str_replace('|VIEWNAME|', $viewName.'.'.$this->resourcefulAction, $newController);
+        $this->files->replace(
+            $controllerPath,
+            $newController
+        );
     }
 }

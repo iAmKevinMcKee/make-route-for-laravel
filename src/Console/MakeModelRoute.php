@@ -29,6 +29,7 @@ class MakeModelRoute extends Command
     private $files;
     private $baseModel;
     private $resourcefulAction;
+    private $controllerName;
 
     /**
      * Create a new command instance.
@@ -54,10 +55,11 @@ class MakeModelRoute extends Command
         if( !$this->appendRoute()) {
             return;
         }
+        $controllerName = Str::studly($this->baseModel).'Controller';
         $controllerUpdated = $this->createOrUpdateController();
         $this->createModelIfDoesNotExist();
         if($controllerUpdated) {
-            $this->createModelView();
+            $this->createModelView(app_path('Http/Controllers/'.$controllerName.'.php'));
         }
         $this->generateTests();
     }
