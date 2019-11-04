@@ -152,9 +152,9 @@ trait CreatesAndUpdatesFiles
         if ($this->resourcefulAction == 'index' || $this->resourcefulAction == 'create') {
             $testClassPath = base_path('tests/Feature/AutomatedRouteTests.php');
             $this->createTestClassIfDoesNotExist($testClassPath);
-            $newTest = $this->files->get(__DIR__.'/../Stubs/Tests/model_test_case.stub');
-            $newTest = str_replace('|MODEL|', Str::studly($this->baseModel), $newTest);
-            $newTest = str_replace('|ACTION|', Str::studly($this->resourcefulAction), $newTest);
+            $newTest = $this->files->get(__DIR__.'/../Stubs/Tests/route_test_case.stub');
+            $methodName = Str::studly($this->baseModel) . Str::studly($this->resourcefulAction);
+            $newTest = str_replace('|METHODNAME|', $methodName, $newTest);
             $slug = Str::slug(Str::snake(Str::plural($this->baseModel)));
             if ($this->resourcefulAction == 'create') {
                 $slug .= '/create';
@@ -170,7 +170,7 @@ trait CreatesAndUpdatesFiles
                 $testClassPath,
                 $testClass
             );
-            $this->info('New Test Added');
+            $this->info('Test test' . $methodName . ' added in ' . $testClassPath);
         }
     }
 
@@ -179,14 +179,10 @@ trait CreatesAndUpdatesFiles
         if ($this->resourcefulAction == 'index' || $this->resourcefulAction == 'create') {
             $testClassPath = base_path('tests/Feature/AutomatedRouteTests.php');
             $this->createTestClassIfDoesNotExist($testClassPath);
-            $newTest = $this->files->get(__DIR__.'/../Stubs/Tests/model_test_case.stub');
-            $newTest = str_replace('|MODEL|', Str::studly($this->baseModel), $newTest);
-            $newTest = str_replace('|ACTION|', Str::studly($this->resourcefulAction), $newTest);
-            $slug = Str::slug(Str::snake(Str::plural($this->baseModel)));
-            if ($this->resourcefulAction == 'create') {
-                $slug .= '/create';
-            }
-            $newTest = str_replace('|SLUG|', $slug, $newTest);
+            $newTest = $this->files->get(__DIR__.'/../Stubs/Tests/route_test_case.stub');
+            $methodName = Str::studly($this->controllerName).Str::studly($this->resourcefulAction);
+            $newTest = str_replace('|METHODNAME|', $methodName, $newTest);
+            $newTest = str_replace('|SLUG|', $this->slug, $newTest);
             $testClass = $this->files->get($testClassPath);
             // remove the last two characters of the controller
             $testClass = substr($testClass, 0, -2);
@@ -197,7 +193,7 @@ trait CreatesAndUpdatesFiles
                 $testClassPath,
                 $testClass
             );
-            $this->info('New Test Added');
+            $this->info('Test test' . $methodName . ' added in ' . $testClassPath);
         }
     }
 

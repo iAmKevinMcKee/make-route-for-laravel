@@ -1,5 +1,5 @@
 
-    public function test|ACTION||ROUTE|()
+    public function test|METHODNAME|()
     {
         $response = $this->get('|SLUG|');
 
