@@ -76,6 +76,7 @@ public function testPizzaPieIndex()
 - If you have not yet created the model, you will be given the option to create it. If you choose to create the model, you can also choose to create the migration as well.
 - This package will run `php artisan make:model PizzaPie`  or `php artisan make:model PizzaPie -m` based on your choices
 
+![](make_model_route.gif)
 ## Non-Model Routes
 If you are creating a route that is not associated with a model, the package works a bit differently.
 ``` php
