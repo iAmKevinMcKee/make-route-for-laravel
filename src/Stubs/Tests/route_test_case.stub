@@ -1,6 +1,8 @@
 
     public function test|METHODNAME|()
     {
+        $this->markTestIncomplete('This test should be reviewed before executing in your test suite');
+
         $response = $this->get('|SLUG|');
 
         $response->assertStatus(200);
